@@ -1,0 +1,14 @@
+{
+  "name": "השם שיוצג לאדם הזה",
+  "intro": "משפט קצר שמופיע לפני המשחק",
+  "game": "memory",
+  "gameTitle": "כותרת קטנה שמופיעה מעל המשחק",
+  "gameHint": "רמז/הנחיה קצרה למשחק",
+  "gameConfig": {
+    "_memory_example": "עבור game=memory, שימו: pairs: [\"🎖️\",\"☕\",\"🪖\",\"🌵\",\"🎸\",\"⚽\"] (עד 8 סמלים)",
+    "_catch_example": "עבור game=catch, שימו: emoji, target (מספר לתפוס), spawnMs, fallMs",
+    "_quiz_example": "עבור game=quiz, שימו: questions: [{q, options:[...], correct: <אינדקס התשובה הנכונה>}]"
+  },
+  "letter": "כאן כותבים את המכתב עצמו.\nאפשר כמה שורות, ירידת שורה = ירידת שורה במסך.",
+  "signoff": "החתימה שלך, למשל: שלך, דניאל"
+}

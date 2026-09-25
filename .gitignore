@@ -1,0 +1,9 @@
+.DS_Store
+Thumbs.db
+node_modules/
+
+# Keep any local roster/notes/backup files with real names out of git -
+# these contain PLAINTEXT letters and must never be committed
+roster.*
+*.local.json
+farewall-backup-*.json

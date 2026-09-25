@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>תצוגה מקדימה - כלי מקומי בלבד</title>
+<link rel="stylesheet" href="../docs/assets/css/style.css">
+<style>
+  .preview-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: #d8b45c;
+    color: #1b1503;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px;
+    z-index: 10;
+  }
+  body { padding-top: 34px; }
+</style>
+</head>
+<body>
+<div class="preview-banner">תצוגה מקדימה מקומית - זה לא הקישור האמיתי ולא ישלח לאף אחד</div>
+<div id="app">
+  <div class="card" id="card">
+    <p class="state-message">טוען תצוגה מקדימה...</p>
+  </div>
+</div>
+
+<script src="../docs/assets/js/crypto-utils.js"></script>
+<script src="../docs/assets/js/render.js"></script>
+<script src="../docs/assets/js/games/memory.js"></script>
+<script src="../docs/assets/js/games/catch.js"></script>
+<script src="../docs/assets/js/games/quiz.js"></script>
+<script src="../docs/assets/js/games/grow.js"></script>
+<script src="../docs/assets/js/games/selfie.js"></script>
+<script src="../docs/assets/js/games/run.js"></script>
+<script src="../docs/assets/js/games/amen.js"></script>
+<script src="../docs/assets/js/games/tiramisu.js"></script>
+<script src="../docs/assets/js/games/calories.js"></script>
+<script src="../docs/assets/js/games/redhead.js"></script>
+<script src="../docs/assets/js/games/campaign.js"></script>
+<script src="../docs/assets/js/games/economy.js"></script>
+<script src="../docs/assets/js/games/throw.js"></script>
+<script>
+(function () {
+  "use strict";
+  var card = document.getElementById("card");
+
+  function fail(msg) {
+    card.innerHTML =
+      '<div class="badge">תצוגה מקדימה</div>' +
+      "<h1>לא ניתן להציג</h1>" +
+      '<p class="state-message">' + msg + "</p>";
+  }
+
+  var hash = window.location.hash || "";
+  if (hash.indexOf("#") === 0) hash = hash.slice(1);
+  var params = new URLSearchParams(hash);
+  var dataB64 = params.get("data");
+
+  if (!dataB64) {
+    fail("לא התקבל תוכן לתצוגה מקדימה. פתחו את זה מתוך admin/index.html.");
+    return;
+  }
+
+  try {
+    var bytes = window.CryptoUtils.base64urlToBytes(dataB64);
+    var text = new TextDecoder().decode(bytes);
+    var person = JSON.parse(text);
+
+    // image paths in gameConfig are relative to docs/ (as served on the real site) -
+    // rewrite them here since this preview page lives one level up, in admin/
+    if (person.gameConfig) {
+      Object.keys(person.gameConfig).forEach(function (k) {
+        var v = person.gameConfig[k];
+        if (typeof v === "string" && v.indexOf("assets/") === 0) {
+          person.gameConfig[k] = "../docs/" + v;
+        }
+      });
+    }
+
+    window.PersonRenderer.run(card, person);
+  } catch (e) {
+    fail("הנתונים לתצוגה המקדימה פגומים.");
+  }
+})();
+</script>
+</body>
+</html>

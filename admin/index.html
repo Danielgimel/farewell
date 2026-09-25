@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>כתיבת מכתבים + ברקודים - כלי מקומי בלבד</title>
+<style>
+  :root { color-scheme: light; }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    max-width: 960px;
+    margin: 24px auto;
+    padding: 0 16px 60px;
+    background: #f6f4ee;
+    color: #1c1c1c;
+  }
+  h1 { font-size: 22px; }
+  h2 { font-size: 17px; margin-top: 8px; }
+  p.note {
+    background: #fff3cd;
+    border: 1px solid #e0c46c;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .panel {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 18px;
+  }
+  label { display: block; font-weight: 600; margin: 14px 0 6px; font-size: 14px; }
+  input[type=text], input[type=number], textarea, select {
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    box-sizing: border-box;
+    font-family: inherit;
+  }
+  textarea#letterField { min-height: 160px; }
+  .row { display: flex; gap: 12px; }
+  .row > div { flex: 1; }
+  button {
+    background: #2f3b22;
+    color: #f6f4ee;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button:hover { background: #445429; }
+  button.secondary {
+    background: transparent;
+    color: #2f3b22;
+    border: 1px solid #2f3b22;
+  }
+  button.small { padding: 5px 10px; font-size: 12px; }
+  button.danger { background: #7a2f22; }
+  .actions-row { margin-top: 16px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .game-config { border-inline-start: 3px solid #d8c98a; padding-inline-start: 12px; margin-top: 10px; }
+  .qblock { background: #f8f7f2; border: 1px solid #e2e2e2; border-radius: 8px; padding: 10px; margin-top: 8px; }
+  .qblock .row { margin-top: 6px; }
+  .qblock label { margin: 8px 0 4px; font-size: 13px; }
+
+  #peopleList { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .person-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8f7f2;
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .person-card .info { font-size: 14px; }
+  .person-card .info small { color: #777; display: block; font-size: 11px; }
+  .person-card .btns { display: flex; gap: 6px; }
+
+  details.advanced { margin-top: 20px; }
+  details.advanced summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+  details.advanced textarea { min-height: 200px; direction: ltr; text-align: left; font-family: monospace; margin-top: 10px; }
+
+  #results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .qr-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+  .qr-card canvas { max-width: 100%; }
+  .qr-card .qname { font-weight: 700; margin: 8px 0 2px; font-size: 14px; }
+  .qr-card .qid { font-size: 11px; color: #777; word-break: break-all; }
+  .qr-card .qurl {
+    font-size: 10px;
+    color: #555;
+    word-break: break-all;
+    background: #f2f2f2;
+    padding: 6px;
+    border-radius: 6px;
+    margin: 8px 0;
+    direction: ltr;
+    text-align: left;
+  }
+  .qr-card .actions { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .qr-card a.dl, .qr-card button.copy {
+    font-size: 12px;
+    color: #fff;
+    background: #2f3b22;
+    border: none;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  #status { font-size: 13px; color: #555; margin-top: 10px; }
+  @media print {
+    p.note, .panel, h1, button, .qurl, .actions { display: none; }
+    #results { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+<h1>כתיבת מכתבים + ברקודים - שימוש מקומי בלבד</h1>
+<p class="note">
+  הדף הזה <b>לא</b> נמצא בתיקיית <code>docs/</code> ולא עולה לאתר הציבורי.
+  כל ההצפנה קורית בדפדפן שלכם, שום דבר לא נשלח לשום שרת.
+  מה שכותבים כאן נשמר גם באופן זמני בדפדפן (כדי שרענון בטעות לא ימחק הכל),
+  אבל שום דבר מזה לא מועלה לשום מקום עד שלוחצים על "הצפן".
+</p>
+
+<div class="panel">
+  <h2>1. כתיבת מכתב לאדם</h2>
+
+  <label for="nameField">שם (יוצג לאדם הזה)</label>
+  <input type="text" id="nameField" placeholder="למשל: יוסי">
+
+  <label for="introField">משפט פתיחה לפני המשחק</label>
+  <input type="text" id="introField" placeholder="לפני המכתב, בוא נזכור כמה דברים ביחד.">
+
+  <label for="gameSelect">איזה מיני-משחק לפני המכתב</label>
+  <select id="gameSelect">
+    <option value="memory">משחק זיכרון (מצא זוגות)</option>
+    <option value="catch">תפוס (פריטים נופלים)</option>
+    <option value="quiz">חידון</option>
+    <option value="grow">התעצמות (בנייה/צמיחה)</option>
+    <option value="selfie">סלפי / אינפלואנסר</option>
+    <option value="run">ריצה - כמה שיותר צעדים</option>
+    <option value="amen">אמן! (רפלקסים דתיים)</option>
+    <option value="tiramisu">טירמיסו - משחק בישול (3 שלבים)</option>
+    <option value="calories">ספירת קלוריות</option>
+    <option value="redhead">מצא את הגינג'י</option>
+    <option value="campaign">מפקד מלחמה - ניהול חזיתות</option>
+    <option value="economy">כלכלה - קנה זול, מכור ביוקר</option>
+    <option value="throw">זריקה על תמונה</option>
+  </select>
+
+  <div class="row">
+    <div>
+      <label for="gameTitleField">כותרת קטנה מעל המשחק</label>
+      <input type="text" id="gameTitleField" placeholder="משחק זיכרון">
+    </div>
+    <div>
+      <label for="gameHintField">רמז קצר למשחק</label>
+      <input type="text" id="gameHintField" placeholder="מצא/י את כל הזוגות">
+    </div>
+  </div>
+
+  <div class="game-config" id="cfgMemory">
+    <label for="memoryPairs">סמלים לזיכרון (מופרדים בפסיק, עד 8)</label>
+    <input type="text" id="memoryPairs" value="🎖️,☕,🪖,🌵,🎸,⚽">
+  </div>
+
+  <div class="game-config" id="cfgCatch" style="display:none">
+    <div class="row">
+      <div>
+        <label for="catchEmoji">סמל שנופל</label>
+        <input type="text" id="catchEmoji" value="❤️">
+      </div>
+      <div>
+        <label for="catchTarget">כמה צריך לתפוס</label>
+        <input type="number" id="catchTarget" value="10" min="1">
+      </div>
+    </div>
+  </div>
+
+  <div class="game-config" id="cfgQuiz" style="display:none">
+    <div id="quizQuestions"></div>
+    <button type="button" class="secondary small" id="addQuestionBtn" style="margin-top:10px">+ הוסף שאלה</button>
+  </div>
+
+  <div class="game-config" id="cfgGrow" style="display:none">
+    <div class="row">
+      <div>
+        <label for="growTarget">כמה לחיצות עד שמתעצמים</label>
+        <input type="number" id="growTarget" value="20" min="1">
+      </div>
+      <div>
+        <label for="growLabel">טקסט על הכפתור</label>
+        <input type="text" id="growLabel" value="תתעצם!">
+      </div>
+    </div>
+    <label for="growMessage">הודעת סיום (מוצגת רגע לפני המכתב)</label>
+    <input type="text" id="growMessage" value="התעצמת!">
+  </div>
+
+  <div class="game-config" id="cfgSelfie" style="display:none">
+    <div class="row">
+      <div>
+        <label for="selfieTarget">כמה "צילומים מושלמים" צריך</label>
+        <input type="number" id="selfieTarget" value="3" min="1">
+      </div>
+      <div>
+        <label for="selfieLabel">טקסט על הכפתור</label>
+        <input type="text" id="selfieLabel" value="📸 צלם!">
+      </div>
+    </div>
+    <label for="selfieMessage">הודעת סיום (מוצגת רגע לפני המכתב)</label>
+    <input type="text" id="selfieMessage" value="ויראלי! 🔥">
+    <p class="note" style="margin-top:10px;font-size:12px">
+      המשחק: סמן זז קדימה-אחורה על פס, וצריך ללחוץ "צלם" בדיוק כשהוא באזור
+      המסומן. כל צילום מוצלח מזיז את האזור למקום חדש.
+    </p>
+  </div>
+
+  <div class="game-config" id="cfgRun" style="display:none">
+    <div class="row">
+      <div>
+        <label for="runTarget">כמה צעדים (לחיצות) עד לסיום המרוץ</label>
+        <input type="number" id="runTarget" value="40" min="1">
+      </div>
+      <div>
+        <label for="runLabel">טקסט על הכפתור</label>
+        <input type="text" id="runLabel" value="רוץ!">
+      </div>
+    </div>
+    <label for="runMessage">הודעת סיום (מוצגת רגע לפני המכתב)</label>
+    <input type="text" id="runMessage" value="שיא אישי!">
+    <p class="note" style="margin-top:10px;font-size:12px">
+      המשחק: לוחצים כמה שיותר מהר כדי "לרוץ" לאורך המסלול עד לדגל, יש גם
+      מד קצב חי שמראה כמה מהר לוחצים.
+    </p>
+  </div>
+
+  <div class="game-config" id="cfgAmen" style="display:none">
+    <div class="row">
+      <div>
+        <label for="amenRounds">כמה פעמים צריך לענות "אמן" בזמן</label>
+        <input type="number" id="amenRounds" value="5" min="1">
+      </div>
+      <div>
+        <label for="amenLabel">טקסט על הכפתור</label>
+        <input type="text" id="amenLabel" value="אמן!">
+      </div>
+    </div>
+    <label for="amenMessage">הודעת סיום (מוצגת רגע לפני המכתב)</label>
+    <input type="text" id="amenMessage" value="אמן אמן! 🙏">
+    <p class="note" style="margin-top:10px;font-size:12px">
+      המשחק: מחכים ש"ברכה" תופיע על המסך ואז לוחצים "אמן" כמה שיותר מהר -
+      מוקדם מדי או מאוחר מדי לא נספר. משחקון קליל בהשראת רפלקס האמן המהיר.
+    </p>
+  </div>
+
+  <div class="game-config" id="cfgTiramisu" style="display:none">
+    <p class="note" style="font-size:12px">
+      משחק בישול קצר בשלושה שלבים: טבילת ביסקוויט בטיימינג נכון, ערבוב קרם
+      מהיר תחת זמן, ואז בניית שכבות.
+    </p>
+    <div class="row">
+      <div>
+        <label for="tiraDips">שלב 1: כמה טבילות מדויקות</label>
+        <input type="number" id="tiraDips" value="2" min="1">
+      </div>
+      <div>
+        <label for="tiraWhiskTarget">שלב 2: כמה לחיצות ערבוב</label>
+        <input type="number" id="tiraWhiskTarget" value="16" min="1">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="tiraWhiskTime">שלב 2: זמן לערבוב (שניות)</label>
+        <input type="number" id="tiraWhiskTime" value="4" min="1" step="0.5">
+      </div>
+      <div>
+        <label for="tiraLayers">שלב 3: כמה שכבות בכוס</label>
+        <input type="number" id="tiraLayers" value="6" min="1">
+      </div>
+    </div>
+    <label for="tiraMessage">הודעת סיום (מוצגת רגע לפני המכתב)</label>
+    <input type="text" id="tiraMessage" value="בתאבון! 🍰">
+  </div>
+
+  <div class="game-config" id="cfgCalories" style="display:none">
+    <p class="note" style="font-size:12px">
+      פריטי אוכל נופלים - צריך לתפוס רק את הבריאים ולהתחמק מהג'אנק פוד.
+    </p>
+    <div class="row">
+      <div>
+        <label for="calTarget">כמה פריטים בריאים צריך לתפוס</label>
+        <input type="number" id="calTarget" value="12" min="1">
+      </div>
+      <div>
+        <label for="calDifficulty">כמה ג'אנק פוד בדרך</label>
+        <select id="calDifficulty">
+          <option value="0.25">מעט</option>
+          <option value="0.4" selected>בינוני</option>
+          <option value="0.55">הרבה</option>
+        </select>
+      </div>
+    </div>
+    <label for="calMessage">הודעת סיום (מוצגת רגע לפני המכתב)</label>
+    <input type="text" id="calMessage" value="יום מושלם של תזונה! 🎉">
+  </div>
+
+  <div class="game-config" id="cfgRedhead" style="display:none">
+    <p class="note" style="font-size:12px">
+      רשת של אנשים, וצריך למצוא את הגינג'י היחיד בכל סבב - כל סבב הרשת
+      גדלה יותר (כמו למצוא גינג'י אמיתי, נדיר יותר ויותר).
+    </p>
+    <label for="redRounds">כמה סבבים</label>
+    <input type="number" id="redRounds" value="4" min="1" max="6">
+    <label for="redMessage">הודעת סיום (מוצגת רגע לפני המכתב)</label>
+    <input type="text" id="redMessage" value="נדיר כמו יהלום! 🔴">
+  </div>
+
+  <div class="game-config" id="cfgCampaign" style="display:none">
+    <p class="note" style="font-size:12px">
+      כמה חזיתות נלחצות בו-זמנית, כל אחת מאבדת שליטה עם הזמן - צריך לתגבר
+      את כולן שוב ושוב עד שהזמן הכולל עובר. חזית שנשארת פרוצה ממשיכה להוסיף
+      זמן כל עוד לא מתגברים אותה - אף פעם לא באמת נחסם, אבל צריך לזוז כל הזמן.
+    </p>
+    <div class="row">
+      <div>
+        <label for="campFronts">כמה חזיתות (2-4)</label>
+        <input type="number" id="campFronts" value="3" min="2" max="4">
+      </div>
+      <div>
+        <label for="campDuration">כמה שניות עד לניצחון</label>
+        <input type="number" id="campDuration" value="20" min="5">
+      </div>
+    </div>
+    <label for="campMessage">הודעת סיום (מוצגת רגע לפני המכתב)</label>
+    <input type="text" id="campMessage" value="המלחמה הוכרעה - ניצחון! 🎖️">
+  </div>
+
+  <div class="game-config" id="cfgEconomy" style="display:none">
+    <p class="note" style="font-size:12px">
+      מחיר זז קדימה-אחורה - צריך "לקנות" כשהוא בשפל (משמאל) ו"למכור" כשהוא
+      בשיא (מימין), חוזר חלילה, כמו משקיע/ת אמיתי.
+    </p>
+    <div class="row">
+      <div>
+        <label for="ecoCycles">כמה עסקאות רווחיות (קנייה+מכירה)</label>
+        <input type="number" id="ecoCycles" value="4" min="1">
+      </div>
+    </div>
+    <label for="ecoMessage">הודעת סיום (מוצגת רגע לפני המכתב)</label>
+    <input type="text" id="ecoMessage" value="המשק פורח! 📈">
+  </div>
+
+  <div class="game-config" id="cfgThrow" style="display:none">
+    <p class="note" style="font-size:12px">
+      לוחצים "זרוק!" ותמונה "עפה" ופוגעת בתמונה השנייה עם רעידה קטנה. את שתי
+      התמונות צריך קודם לשים בתיקייה <code>docs/assets/img/</code> (שם קובץ
+      באנגלית, בלי רווחים) - כרגע כבר יש שם <code>daniel.png</code> ו-
+      <code>popit-yellow.png</code>.
+    </p>
+    <div class="row">
+      <div>
+        <label for="throwTargetImg">קובץ התמונה שנפגעת (היעד)</label>
+        <input type="text" id="throwTargetImg" value="assets/img/daniel.png">
+      </div>
+      <div>
+        <label for="throwProjImg">קובץ התמונה שנזרקת</label>
+        <input type="text" id="throwProjImg" value="assets/img/popit-yellow.png">
+      </div>
+    </div>
+    <div class="row">
+      <div>
+        <label for="throwTarget">כמה זריקות</label>
+        <input type="number" id="throwTarget" value="10" min="1">
+      </div>
+      <div>
+        <label for="throwLabel">טקסט על הכפתור</label>
+        <input type="text" id="throwLabel" value="זרוק!">
+      </div>
+    </div>
+    <label for="throwMessage">הודעת סיום (מוצגת רגע לפני המכתב)</label>
+    <input type="text" id="throwMessage" value="קלעת ישר בפרצוף! 😂">
+  </div>
+
+  <label for="letterField">המכתב עצמו</label>
+  <textarea id="letterField" placeholder="יוסי היקר,&#10;&#10;..."></textarea>
+
+  <label for="signoffField">חתימה</label>
+  <input type="text" id="signoffField" placeholder="שלך, דניאל">
+
+  <div class="actions-row">
+    <button id="addPersonBtn" type="button">הוסף לרשימה</button>
+    <button id="cancelEditBtn" type="button" class="secondary" style="display:none">בטל עריכה</button>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>2. אנשים שנוספו (<span id="peopleCount">0</span>)</h2>
+  <div id="peopleList"></div>
+  <p id="emptyHint" style="color:#777;font-size:13px;margin-top:10px">עוד לא הוספת אף אחד.</p>
+
+  <div class="actions-row">
+    <button type="button" id="downloadBackupBtn">הורד גיבוי לקובץ</button>
+    <button type="button" class="secondary" id="restoreBackupBtn">שחזר מקובץ גיבוי</button>
+    <input type="file" id="restoreFileInput" accept="application/json" style="display:none">
+  </div>
+  <p class="note" style="font-size:12px;margin-top:8px">
+    הרשימה נשמרת אוטומטית בדפדפן הזה בלבד (לא קובץ אמיתי) - אם תנקו נתוני
+    גלישה, תעברו דפדפן/מחשב, או תפתחו במצב פרטי, היא עלולה להיעלם. מומלץ
+    ללחוץ "הורד גיבוי לקובץ" מדי פעם ולשמור את הקובץ במקום בטוח (זה טקסט
+    רגיל, לא מוצפן - כי זה עדיין רק טיוטה אצלכם, לא הקישורים הסופיים).
+  </p>
+
+  <details class="advanced">
+    <summary>ייבוא / ייצוא כ-JSON (מתקדם)</summary>
+    <textarea id="jsonAdvanced"></textarea>
+    <div class="actions-row">
+      <button type="button" class="secondary" id="importJsonBtn">ייבא מהתיבה</button>
+      <button type="button" class="secondary" id="exportJsonBtn">ייצא לתיבה</button>
+    </div>
+  </details>
+</div>
+
+<div class="panel">
+  <h2>3. מכתב משותף לכולם (אופציונלי)</h2>
+  <p class="note" style="font-size:12px">
+    טקסט אחד שמופיע אצל <b>כולם</b>, אחרי המכתב האישי שלהם - עם כפתור ברור
+    "יש עוד דבר אחד - לכולם" שאי אפשר לפספס, כדי שכל אחד יראה גם את זה ולא
+    רק את המכתב הפרטני שלו. משאירים ריק אם לא רוצים את זה בכלל.
+  </p>
+  <label for="groupLetterField">המכתב המשותף</label>
+  <textarea id="groupLetterField" placeholder="לכולם,&#10;&#10;..." style="min-height:140px"></textarea>
+</div>
+
+<div class="panel">
+  <h2>4. הצפנה ויצירת ברקודים</h2>
+  <label for="baseUrl">כתובת הבסיס של האתר</label>
+  <input type="text" id="baseUrl" placeholder="https://username.github.io/farewall/  (בבדיקה מקומית: http://localhost:8000/)">
+  <div class="actions-row">
+    <button id="genBtn">הצפן, צור ברקודים וקבצים לכולם</button>
+    <button id="printBtn" type="button" class="secondary">הדפס את כל הברקודים</button>
+  </div>
+  <div id="status"></div>
+  <p class="note" style="margin-top:14px">
+    לכל אדם תקבלו כרטיס עם: כפתור להורדת קובץ JSON מוצפן (שמרו אותו בתוך
+    <code>docs/data/people/</code> בשם שמופיע כ"קובץ"), כפתור להורדת QR כ-PNG,
+    וכפתור להעתקת הקישור המלא (אם עדיף לשלוח בוואטסאפ במקום ברקוד מודפס).
+  </p>
+</div>
+
+<div id="results"></div>
+
+<script src="vendor/qrcode.min.js"></script>
+<script src="../docs/assets/js/crypto-utils.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var STORAGE_KEY = "farewall-admin-people-v1";
+  var GROUP_STORAGE_KEY = "farewall-admin-group-letter-v1";
+  var people = [];
+  var editingIndex = -1;
+
+  function safeLoad() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) people = JSON.parse(raw);
+    } catch (e) { people = []; }
+  }
+
+  function safeSave() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(people)); } catch (e) {}
+  }
+
+  function loadGroupLetter() {
+    try { return localStorage.getItem(GROUP_STORAGE_KEY) || ""; } catch (e) { return ""; }
+  }
+
+  function saveGroupLetter() {
+    try { localStorage.setItem(GROUP_STORAGE_KEY, document.getElementById("groupLetterField").value); } catch (e) {}
+  }
+
+  function makeId() {
+    var bytes = new Uint8Array(8);
+    crypto.getRandomValues(bytes);
+    return Array.prototype.map.call(bytes, function (b) {
+      return b.toString(16).padStart(2, "0");
+    }).join("");
+  }
+
+  // ---------- game select / config panels ----------
+
+  var gameSelect = document.getElementById("gameSelect");
+  var cfgPanels = {
+    memory: document.getElementById("cfgMemory"),
+    catch: document.getElementById("cfgCatch"),
+    quiz: document.getElementById("cfgQuiz"),
+    redhead: document.getElementById("cfgRedhead"),
+    campaign: document.getElementById("cfgCampaign"),
+    economy: document.getElementById("cfgEconomy"),
+    throw: document.getElementById("cfgThrow"),
+    grow: document.getElementById("cfgGrow"),
+    selfie: document.getElementById("cfgSelfie"),
+    run: document.getElementById("cfgRun"),
+    amen: document.getElementById("cfgAmen"),
+    tiramisu: document.getElementById("cfgTiramisu"),
+    calories: document.getElementById("cfgCalories")
+  };
+
+  function showConfigFor(game) {
+    Object.keys(cfgPanels).forEach(function (k) {
+      cfgPanels[k].style.display = k === game ? "" : "none";
+    });
+  }
+  gameSelect.addEventListener("change", function () { showConfigFor(gameSelect.value); });
+
+  // ---------- quiz question builder ----------
+
+  var quizContainer = document.getElementById("quizQuestions");
+
+  function addQuestionBlock(data) {
+    data = data || { q: "", options: ["", ""], correct: 0 };
+    var block = document.createElement("div");
+    block.className = "qblock";
+    block.innerHTML =
+      '<label>שאלה</label>' +
+      '<input type="text" class="qq" value="' + escapeAttr(data.q) + '">' +
+      '<div class="row">' +
+      '<div><label>תשובה נכונה</label><input type="text" class="qa0" value="' + escapeAttr(data.options[0] || "") + '"></div>' +
+      '<div><label>תשובה שגויה</label><input type="text" class="qa1" value="' + escapeAttr(data.options[1] || "") + '"></div>' +
+      '</div>' +
+      '<button type="button" class="secondary small remove-q" style="margin-top:8px">הסר שאלה</button>';
+    block.querySelector(".remove-q").addEventListener("click", function () {
+      block.remove();
+    });
+    quizContainer.appendChild(block);
+  }
+
+  document.getElementById("addQuestionBtn").addEventListener("click", function () {
+    addQuestionBlock();
+  });
+
+  function readQuizQuestions() {
+    var blocks = quizContainer.querySelectorAll(".qblock");
+    var out = [];
+    blocks.forEach(function (b) {
+      var q = b.querySelector(".qq").value.trim();
+      var a0 = b.querySelector(".qa0").value.trim();
+      var a1 = b.querySelector(".qa1").value.trim();
+      if (q && a0 && a1) {
+        out.push({ q: q, options: [a0, a1], correct: 0 });
+      }
+    });
+    return out;
+  }
+
+  function escapeAttr(s) {
+    return String(s || "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+  }
+
+  // ---------- form <-> person object ----------
+
+  function clearForm() {
+    document.getElementById("nameField").value = "";
+    document.getElementById("introField").value = "";
+    gameSelect.value = "memory";
+    showConfigFor("memory");
+    document.getElementById("gameTitleField").value = "";
+    document.getElementById("gameHintField").value = "";
+    document.getElementById("memoryPairs").value = "🎖️,☕,🪖,🌵,🎸,⚽";
+    document.getElementById("catchEmoji").value = "❤️";
+    document.getElementById("catchTarget").value = "10";
+    quizContainer.innerHTML = "";
+    addQuestionBlock();
+    document.getElementById("growTarget").value = "20";
+    document.getElementById("growLabel").value = "תתעצם!";
+    document.getElementById("growMessage").value = "התעצמת!";
+    document.getElementById("selfieTarget").value = "3";
+    document.getElementById("selfieLabel").value = "📸 צלם!";
+    document.getElementById("selfieMessage").value = "ויראלי! 🔥";
+    document.getElementById("runTarget").value = "40";
+    document.getElementById("runLabel").value = "רוץ!";
+    document.getElementById("runMessage").value = "שיא אישי!";
+    document.getElementById("amenRounds").value = "5";
+    document.getElementById("amenLabel").value = "אמן!";
+    document.getElementById("amenMessage").value = "אמן אמן! 🙏";
+    document.getElementById("tiraDips").value = "2";
+    document.getElementById("tiraWhiskTarget").value = "16";
+    document.getElementById("tiraWhiskTime").value = "4";
+    document.getElementById("tiraLayers").value = "6";
+    document.getElementById("tiraMessage").value = "בתאבון! 🍰";
+    document.getElementById("calTarget").value = "12";
+    document.getElementById("calDifficulty").value = "0.4";
+    document.getElementById("calMessage").value = "יום מושלם של תזונה! 🎉";
+    document.getElementById("redRounds").value = "4";
+    document.getElementById("redMessage").value = "נדיר כמו יהלום! 🔴";
+    document.getElementById("campFronts").value = "3";
+    document.getElementById("campDuration").value = "20";
+    document.getElementById("campMessage").value = "המלחמה הוכרעה - ניצחון! 🎖️";
+    document.getElementById("ecoCycles").value = "4";
+    document.getElementById("ecoMessage").value = "המשק פורח! 📈";
+    document.getElementById("throwTargetImg").value = "assets/img/daniel.png";
+    document.getElementById("throwProjImg").value = "assets/img/popit-yellow.png";
+    document.getElementById("throwTarget").value = "10";
+    document.getElementById("throwLabel").value = "זרוק!";
+    document.getElementById("throwMessage").value = "קלעת ישר בפרצוף! 😂";
+    document.getElementById("letterField").value = "";
+    document.getElementById("signoffField").value = "";
+    editingIndex = -1;
+    document.getElementById("addPersonBtn").textContent = "הוסף לרשימה";
+    document.getElementById("cancelEditBtn").style.display = "none";
+  }
+
+  function readFormAsPerson() {
+    var game = gameSelect.value;
+    var gameConfig = {};
+
+    if (game === "memory") {
+      var pairs = document.getElementById("memoryPairs").value
+        .split(",").map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 8);
+      gameConfig = { pairs: pairs.length ? pairs : ["🎖️", "☕", "🪖", "🌵", "🎸", "⚽"] };
+    } else if (game === "catch") {
+      gameConfig = {
+        emoji: document.getElementById("catchEmoji").value.trim() || "❤️",
+        target: parseInt(document.getElementById("catchTarget").value, 10) || 10,
+        spawnMs: 650,
+        fallMs: 3000
+      };
+    } else if (game === "quiz") {
+      var questions = readQuizQuestions();
+      gameConfig = { questions: questions.length ? questions : [{ q: "?", options: ["כן", "לא"], correct: 0 }] };
+    } else if (game === "grow") {
+      gameConfig = {
+        target: parseInt(document.getElementById("growTarget").value, 10) || 20,
+        label: document.getElementById("growLabel").value.trim() || "תתעצם!",
+        message: document.getElementById("growMessage").value.trim() || "התעצמת!"
+      };
+    } else if (game === "selfie") {
+      gameConfig = {
+        target: parseInt(document.getElementById("selfieTarget").value, 10) || 3,
+        label: document.getElementById("selfieLabel").value.trim() || "📸 צלם!",
+        message: document.getElementById("selfieMessage").value.trim() || "ויראלי! 🔥"
+      };
+    } else if (game === "run") {
+      gameConfig = {
+        target: parseInt(document.getElementById("runTarget").value, 10) || 40,
+        label: document.getElementById("runLabel").value.trim() || "רוץ!",
+        message: document.getElementById("runMessage").value.trim() || "שיא אישי!"
+      };
+    } else if (game === "amen") {
+      gameConfig = {
+        rounds: parseInt(document.getElementById("amenRounds").value, 10) || 5,
+        label: document.getElementById("amenLabel").value.trim() || "אמן!",
+        message: document.getElementById("amenMessage").value.trim() || "אמן אמן! 🙏"
+      };
+    } else if (game === "tiramisu") {
+      gameConfig = {
+        dips: parseInt(document.getElementById("tiraDips").value, 10) || 2,
+        whiskTarget: parseInt(document.getElementById("tiraWhiskTarget").value, 10) || 16,
+        whiskTimeMs: Math.round((parseFloat(document.getElementById("tiraWhiskTime").value) || 4) * 1000),
+        layers: parseInt(document.getElementById("tiraLayers").value, 10) || 6,
+        message: document.getElementById("tiraMessage").value.trim() || "בתאבון! 🍰"
+      };
+    } else if (game === "calories") {
+      gameConfig = {
+        target: parseInt(document.getElementById("calTarget").value, 10) || 12,
+        badRatio: parseFloat(document.getElementById("calDifficulty").value) || 0.4,
+        message: document.getElementById("calMessage").value.trim() || "יום מושלם של תזונה! 🎉"
+      };
+    } else if (game === "redhead") {
+      var redRounds = parseInt(document.getElementById("redRounds").value, 10) || 4;
+      var gridSizes = [];
+      for (var ri = 0; ri < redRounds; ri++) gridSizes.push(Math.pow(3 + ri, 2));
+      gameConfig = {
+        gridSizes: gridSizes,
+        message: document.getElementById("redMessage").value.trim() || "נדיר כמו יהלום! 🔴"
+      };
+    } else if (game === "campaign") {
+      var allFrontNames = ["חזית צפון", "חזית מרכז", "חזית דרום", "חזית מזרח"];
+      var frontsCount = Math.max(2, Math.min(4, parseInt(document.getElementById("campFronts").value, 10) || 3));
+      gameConfig = {
+        fronts: allFrontNames.slice(0, frontsCount),
+        durationSec: parseInt(document.getElementById("campDuration").value, 10) || 20,
+        message: document.getElementById("campMessage").value.trim() || "המלחמה הוכרעה - ניצחון! 🎖️"
+      };
+    } else if (game === "economy") {
+      gameConfig = {
+        cycles: parseInt(document.getElementById("ecoCycles").value, 10) || 4,
+        message: document.getElementById("ecoMessage").value.trim() || "המשק פורח! 📈"
+      };
+    } else if (game === "throw") {
+      gameConfig = {
+        targetImg: document.getElementById("throwTargetImg").value.trim() || "assets/img/daniel.png",
+        projectileImg: document.getElementById("throwProjImg").value.trim() || "assets/img/popit-yellow.png",
+        target: parseInt(document.getElementById("throwTarget").value, 10) || 10,
+        label: document.getElementById("throwLabel").value.trim() || "זרוק!",
+        message: document.getElementById("throwMessage").value.trim() || "קלעת ישר בפרצוף! 😂"
+      };
+    }
+
+    return {
+      id: editingIndex >= 0 ? people[editingIndex].id : "",
+      name: document.getElementById("nameField").value.trim() || "(ללא שם)",
+      intro: document.getElementById("introField").value.trim() || "לפני המכתב, יש לך פה משהו קטן ממני.",
+      game: game,
+      gameTitle: document.getElementById("gameTitleField").value.trim() || "אתגר קטן",
+      gameHint: document.getElementById("gameHintField").value.trim() || "",
+      gameConfig: gameConfig,
+      letter: document.getElementById("letterField").value,
+      signoff: document.getElementById("signoffField").value.trim()
+    };
+  }
+
+  function loadPersonIntoForm(p) {
+    document.getElementById("nameField").value = p.name || "";
+    document.getElementById("introField").value = p.intro || "";
+    gameSelect.value = p.game || "memory";
+    showConfigFor(gameSelect.value);
+    document.getElementById("gameTitleField").value = p.gameTitle || "";
+    document.getElementById("gameHintField").value = p.gameHint || "";
+
+    if (p.game === "memory") {
+      document.getElementById("memoryPairs").value = (p.gameConfig.pairs || []).join(",");
+    } else if (p.game === "catch") {
+      document.getElementById("catchEmoji").value = p.gameConfig.emoji || "❤️";
+      document.getElementById("catchTarget").value = p.gameConfig.target || 10;
+    } else if (p.game === "quiz") {
+      quizContainer.innerHTML = "";
+      (p.gameConfig.questions || []).forEach(function (q) { addQuestionBlock(q); });
+      if (!quizContainer.children.length) addQuestionBlock();
+    } else if (p.game === "grow") {
+      document.getElementById("growTarget").value = p.gameConfig.target || 20;
+      document.getElementById("growLabel").value = p.gameConfig.label || "תתעצם!";
+      document.getElementById("growMessage").value = p.gameConfig.message || "התעצמת!";
+    } else if (p.game === "selfie") {
+      document.getElementById("selfieTarget").value = p.gameConfig.target || 3;
+      document.getElementById("selfieLabel").value = p.gameConfig.label || "📸 צלם!";
+      document.getElementById("selfieMessage").value = p.gameConfig.message || "ויראלי! 🔥";
+    } else if (p.game === "run") {
+      document.getElementById("runTarget").value = p.gameConfig.target || 40;
+      document.getElementById("runLabel").value = p.gameConfig.label || "רוץ!";
+      document.getElementById("runMessage").value = p.gameConfig.message || "שיא אישי!";
+    } else if (p.game === "amen") {
+      document.getElementById("amenRounds").value = p.gameConfig.rounds || 5;
+      document.getElementById("amenLabel").value = p.gameConfig.label || "אמן!";
+      document.getElementById("amenMessage").value = p.gameConfig.message || "אמן אמן! 🙏";
+    } else if (p.game === "tiramisu") {
+      document.getElementById("tiraDips").value = p.gameConfig.dips || 2;
+      document.getElementById("tiraWhiskTarget").value = p.gameConfig.whiskTarget || 16;
+      document.getElementById("tiraWhiskTime").value = (p.gameConfig.whiskTimeMs || 4000) / 1000;
+      document.getElementById("tiraLayers").value = p.gameConfig.layers || 6;
+      document.getElementById("tiraMessage").value = p.gameConfig.message || "בתאבון! 🍰";
+    } else if (p.game === "calories") {
+      document.getElementById("calTarget").value = p.gameConfig.target || 12;
+      document.getElementById("calDifficulty").value = p.gameConfig.badRatio || 0.4;
+      document.getElementById("calMessage").value = p.gameConfig.message || "יום מושלם של תזונה! 🎉";
+    } else if (p.game === "redhead") {
+      document.getElementById("redRounds").value = (p.gameConfig.gridSizes || []).length || 4;
+      document.getElementById("redMessage").value = p.gameConfig.message || "נדיר כמו יהלום! 🔴";
+    } else if (p.game === "campaign") {
+      document.getElementById("campFronts").value = (p.gameConfig.fronts || []).length || 3;
+      document.getElementById("campDuration").value = p.gameConfig.durationSec || 20;
+      document.getElementById("campMessage").value = p.gameConfig.message || "המלחמה הוכרעה - ניצחון! 🎖️";
+    } else if (p.game === "economy") {
+      document.getElementById("ecoCycles").value = p.gameConfig.cycles || 4;
+      document.getElementById("ecoMessage").value = p.gameConfig.message || "המשק פורח! 📈";
+    } else if (p.game === "throw") {
+      document.getElementById("throwTargetImg").value = p.gameConfig.targetImg || "assets/img/daniel.png";
+      document.getElementById("throwProjImg").value = p.gameConfig.projectileImg || "assets/img/popit-yellow.png";
+      document.getElementById("throwTarget").value = p.gameConfig.target || 10;
+      document.getElementById("throwLabel").value = p.gameConfig.label || "זרוק!";
+      document.getElementById("throwMessage").value = p.gameConfig.message || "קלעת ישר בפרצוף! 😂";
+    }
+
+    document.getElementById("letterField").value = p.letter || "";
+    document.getElementById("signoffField").value = p.signoff || "";
+  }
+
+  // ---------- people list rendering ----------
+
+  var peopleListEl = document.getElementById("peopleList");
+  var peopleCountEl = document.getElementById("peopleCount");
+  var emptyHintEl = document.getElementById("emptyHint");
+
+  function renderPeopleList() {
+    peopleListEl.innerHTML = "";
+    peopleCountEl.textContent = people.length;
+    emptyHintEl.style.display = people.length ? "none" : "";
+
+    people.forEach(function (p, index) {
+      var card = document.createElement("div");
+      card.className = "person-card";
+
+      var info = document.createElement("div");
+      info.className = "info";
+      info.innerHTML = "<b>" + escapeAttr(p.name) + "</b> &middot; " + escapeAttr(p.game) +
+        "<small>" + escapeAttr((p.letter || "").slice(0, 40)) + (p.letter && p.letter.length > 40 ? "…" : "") + "</small>";
+      card.appendChild(info);
+
+      var btns = document.createElement("div");
+      btns.className = "btns";
+
+      var previewBtn = document.createElement("button");
+      previewBtn.type = "button";
+      previewBtn.className = "secondary small";
+      previewBtn.textContent = "תצוגה מקדימה";
+      previewBtn.addEventListener("click", function () {
+        try {
+          var previewPerson = Object.assign({}, p);
+          var groupLetterPreview = document.getElementById("groupLetterField").value.trim();
+          if (groupLetterPreview) previewPerson.groupLetter = groupLetterPreview;
+          var bytes = new TextEncoder().encode(JSON.stringify(previewPerson));
+          var dataB64 = window.CryptoUtils.bytesToBase64url(bytes);
+          window.open("preview.html#data=" + dataB64, "_blank");
+        } catch (e) {
+          alert("לא הצלחתי לפתוח תצוגה מקדימה: " + e.message);
+        }
+      });
+      btns.appendChild(previewBtn);
+
+      var editBtn = document.createElement("button");
+      editBtn.type = "button";
+      editBtn.className = "secondary small";
+      editBtn.textContent = "ערוך";
+      editBtn.addEventListener("click", function () {
+        editingIndex = index;
+        loadPersonIntoForm(p);
+        document.getElementById("addPersonBtn").textContent = "עדכן ברשימה";
+        document.getElementById("cancelEditBtn").style.display = "";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      btns.appendChild(editBtn);
+
+      var delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "danger small";
+      delBtn.textContent = "מחק";
+      delBtn.addEventListener("click", function () {
+        if (!confirm("למחוק את " + p.name + " מהרשימה?")) return;
+        people.splice(index, 1);
+        safeSave();
+        renderPeopleList();
+      });
+      btns.appendChild(delBtn);
+
+      card.appendChild(btns);
+      peopleListEl.appendChild(card);
+    });
+  }
+
+  document.getElementById("addPersonBtn").addEventListener("click", function () {
+    var person = readFormAsPerson();
+    if (editingIndex >= 0) {
+      people[editingIndex] = person;
+    } else {
+      people.push(person);
+    }
+    safeSave();
+    renderPeopleList();
+    clearForm();
+  });
+
+  document.getElementById("cancelEditBtn").addEventListener("click", function () {
+    clearForm();
+  });
+
+  // ---------- advanced JSON import/export ----------
+
+  document.getElementById("exportJsonBtn").addEventListener("click", function () {
+    document.getElementById("jsonAdvanced").value = JSON.stringify(people, null, 2);
+  });
+
+  document.getElementById("importJsonBtn").addEventListener("click", function () {
+    var raw = document.getElementById("jsonAdvanced").value.trim();
+    if (!raw) return;
+    try {
+      var arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) throw new Error("not array");
+      people = arr;
+      safeSave();
+      renderPeopleList();
+    } catch (e) {
+      alert("JSON לא תקין - חייב להיות מערך [ {...}, {...} ]");
+    }
+  });
+
+  // ---------- backup to / restore from a real file ----------
+
+  document.getElementById("downloadBackupBtn").addEventListener("click", function () {
+    if (!people.length) {
+      alert("הרשימה ריקה - אין מה לגבות עדיין.");
+      return;
+    }
+    var stamp = new Date().toISOString().slice(0, 10);
+    var backup = { people: people, groupLetter: document.getElementById("groupLetterField").value };
+    downloadBlob("farewall-backup-" + stamp + ".json", JSON.stringify(backup, null, 2), "application/json");
+  });
+
+  var restoreInput = document.getElementById("restoreFileInput");
+  document.getElementById("restoreBackupBtn").addEventListener("click", function () {
+    restoreInput.click();
+  });
+  restoreInput.addEventListener("change", function () {
+    var file = restoreInput.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var parsed = JSON.parse(reader.result);
+        var arr = Array.isArray(parsed) ? parsed : parsed.people;
+        var restoredGroupLetter = Array.isArray(parsed) ? null : (parsed.groupLetter || "");
+        if (!Array.isArray(arr)) throw new Error("not array");
+        if (people.length && !confirm("יש כבר " + people.length + " אנשים ברשימה הנוכחית. לשחזר את הגיבוי יחליף אותם - להמשיך?")) {
+          return;
+        }
+        people = arr;
+        safeSave();
+        if (restoredGroupLetter !== null) {
+          document.getElementById("groupLetterField").value = restoredGroupLetter;
+          saveGroupLetter();
+        }
+        renderPeopleList();
+        alert("שוחזרו " + people.length + " אנשים מהגיבוי.");
+      } catch (e) {
+        alert("הקובץ לא תקין - זה לא גיבוי JSON תקין מהכלי הזה.");
+      }
+    };
+    reader.readAsText(file);
+    restoreInput.value = "";
+  });
+
+  // ---------- encrypt + QR generation ----------
+
+  function downloadBlob(filename, text, type) {
+    var blob = new Blob([text], { type: type || "application/octet-stream" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  var genBtn = document.getElementById("genBtn");
+  var results = document.getElementById("results");
+  var statusEl = document.getElementById("status");
+
+  async function processAll() {
+    statusEl.textContent = "";
+    results.innerHTML = "";
+
+    if (!people.length) {
+      alert("עוד לא הוספת אף אחד לרשימה.");
+      return;
+    }
+
+    var baseUrl = document.getElementById("baseUrl").value.trim();
+    if (!baseUrl) {
+      alert("צריך להזין כתובת בסיס לאתר קודם");
+      return;
+    }
+    if (!/\/$/.test(baseUrl)) baseUrl += "/";
+
+    genBtn.disabled = true;
+    statusEl.textContent = "מצפין...";
+
+    try {
+    for (var i = 0; i < people.length; i++) {
+      var person = people[i];
+      var id = (person.id || "").trim() || makeId();
+      var name = person.name || "(ללא שם)";
+
+      var toEncrypt = {};
+      Object.keys(person).forEach(function (k) {
+        if (k !== "id") toEncrypt[k] = person[k];
+      });
+      var groupLetterText = document.getElementById("groupLetterField").value.trim();
+      if (groupLetterText) toEncrypt.groupLetter = groupLetterText;
+
+      var enc = await window.CryptoUtils.encryptPerson(toEncrypt);
+      var url = baseUrl + "?id=" + encodeURIComponent(id) + "#k=" + enc.keyB64url;
+      var ciphertextJson = JSON.stringify(enc.payload, null, 2);
+
+      var card = document.createElement("div");
+      card.className = "qr-card";
+
+      var qrHolder = document.createElement("div");
+      card.appendChild(qrHolder);
+
+      var nameEl = document.createElement("div");
+      nameEl.className = "qname";
+      nameEl.textContent = name;
+      card.appendChild(nameEl);
+
+      var idEl = document.createElement("div");
+      idEl.className = "qid";
+      idEl.textContent = "קובץ: " + id + ".json";
+      card.appendChild(idEl);
+
+      var urlEl = document.createElement("div");
+      urlEl.className = "qurl";
+      urlEl.textContent = url;
+      card.appendChild(urlEl);
+
+      var actions = document.createElement("div");
+      actions.className = "actions";
+
+      var dlJson = document.createElement("a");
+      dlJson.className = "dl";
+      dlJson.textContent = "הורד JSON מוצפן";
+      dlJson.href = "#";
+      dlJson.addEventListener("click", function (jsonText, fname) {
+        return function (ev) {
+          ev.preventDefault();
+          downloadBlob(fname, jsonText, "application/json");
+        };
+      }(ciphertextJson, id + ".json"));
+      actions.appendChild(dlJson);
+
+      var dlPng = document.createElement("a");
+      dlPng.className = "dl";
+      dlPng.textContent = "הורד QR PNG";
+      actions.appendChild(dlPng);
+
+      var copyBtn = document.createElement("button");
+      copyBtn.className = "copy";
+      copyBtn.type = "button";
+      copyBtn.textContent = "העתק קישור";
+      copyBtn.addEventListener("click", function (linkUrl) {
+        return function () {
+          navigator.clipboard.writeText(linkUrl).catch(function () {});
+        };
+      }(url));
+      actions.appendChild(copyBtn);
+
+      card.appendChild(actions);
+      results.appendChild(card);
+
+      try {
+        new QRCode(qrHolder, {
+          text: url,
+          width: 220,
+          height: 220,
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        var qrCanvas = qrHolder.querySelector("canvas");
+        if (qrCanvas) {
+          dlPng.href = qrCanvas.toDataURL("image/png");
+          dlPng.download = name + "-" + id + ".png";
+        } else {
+          // some browsers fall back to an HTML-table QR render instead of canvas -
+          // still visible and printable, just not downloadable as a PNG
+          dlPng.textContent = "אין PNG בדפדפן הזה - אפשר להדפיס";
+          dlPng.removeAttribute("href");
+          dlPng.style.opacity = "0.6";
+          dlPng.style.cursor = "default";
+        }
+      } catch (e) {
+        idEl.textContent += " (שגיאה ביצירת QR: " + e.message + ")";
+      }
+    }
+    statusEl.textContent = "בוצע: " + people.length + " מכתבים הוצפנו.";
+    } catch (e) {
+      statusEl.textContent = "שגיאה: " + e.message;
+    }
+
+    genBtn.disabled = false;
+  }
+
+  genBtn.addEventListener("click", function () { processAll(); });
+  document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+
+  document.getElementById("groupLetterField").addEventListener("input", saveGroupLetter);
+
+  // ---------- init ----------
+
+  safeLoad();
+  document.getElementById("groupLetterField").value = loadGroupLetter();
+  showConfigFor("memory");
+  addQuestionBlock();
+  renderPeopleList();
+})();
+</script>
+</body>
+</html>
